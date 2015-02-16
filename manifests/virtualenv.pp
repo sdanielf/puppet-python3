@@ -99,6 +99,7 @@ define python::virtualenv (
 
     $virtualenv = $version ? {
       'system' => 'virtualenv',
+      '3' => 'virtualenv',
       default  => "virtualenv-${version}",
     }
 
@@ -154,7 +155,7 @@ define python::virtualenv (
 
 
     exec { "python_virtualenv_${venv_dir}":
-      command     => "true ${proxy_command} && ${virtualenv} ${system_pkgs_flag} -p ${python} ${venv_dir} && ${venv_dir}/bin/pip wheel --help > /dev/null 2>&1 && { ${venv_dir}/bin/pip wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; { ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} \$wheel_support_flag --upgrade pip ${distribute_pkg} || ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag}  --upgrade pip ${distribute_pkg} ;}",
+      command     => "true ${proxy_command} && ${virtualenv} ${system_pkgs_flag} --no-pip -p ${python} ${venv_dir} && curl https://bootstrap.pypa.io/get-pip.py | ${venv_dir}/bin/python && ${venv_dir}/bin/pip wheel --help > /dev/null 2>&1 && { ${venv_dir}/bin/pip wheel --version > /dev/null 2>&1 || wheel_support_flag='--no-use-wheel'; } ; { ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag} \$wheel_support_flag --upgrade pip ${distribute_pkg} || ${venv_dir}/bin/pip --log ${venv_dir}/pip.log install ${pypi_index} ${proxy_flag}  --upgrade pip ${distribute_pkg} ;}",
       user        => $owner,
       creates     => "${venv_dir}/bin/activate",
       path        => $path,
